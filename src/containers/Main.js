@@ -10,6 +10,10 @@ import { settings } from "../portfolio.js";
 import Error404 from "../pages/errors/error404/Error";
 import ResumePage from "../pages/resume/Resume.js";
 
+const basename = window.location.pathname.startsWith("/portfolio-ahmed")
+  ? "/portfolio-ahmed"
+  : "/";
+
 export default class Main extends Component {
   componentDidMount() {
     document.documentElement.style.setProperty(
@@ -31,7 +35,7 @@ export default class Main extends Component {
   }
   render() {
     return (
-      <BrowserRouter basename="/">
+      <BrowserRouter basename={basename}>
         <Switch>
           <Route
             path="/"
