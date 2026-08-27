@@ -6,6 +6,10 @@ class CertificationCard extends Component {
   render() {
     const certificate = this.props.certificate;
     const theme = this.props.theme;
+    const logoSrc = certificate.logo_path?.startsWith("http")
+      ? certificate.logo_path
+      : require(`../../assets/images/${certificate.logo_path}`);
+
     return (
       <Fade bottom duration={2000} distance="20px">
         <div className="cert-card">
@@ -22,7 +26,7 @@ class CertificationCard extends Component {
               >
                 <img
                   className="logo_img"
-                  src={require(`../../assets/images/${certificate.logo_path}`)}
+                  src={logoSrc}
                   alt={certificate.alt_name}
                 />
               </div>

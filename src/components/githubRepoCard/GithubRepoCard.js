@@ -9,6 +9,9 @@ export default function GithubRepoCard({ repo, theme }) {
     win.focus();
   }
 
+  const createdDate = (repo.createdAt || repo.created_at || "").split("T")[0];
+  const languages = repo.languages || [];
+
   return (
     <div className="repo-card-div" style={{ backgroundColor: theme.highlight }}>
       <Fade bottom duration={2000} distance="40px">
@@ -39,12 +42,9 @@ export default function GithubRepoCard({ repo, theme }) {
               className="repo-creation-date subTitle"
               style={{ color: theme.secondaryText }}
             >
-              Created on {repo.createdAt.split("T")[0]}
+              Created on {createdDate}
             </p>
-            <ProjectLanguages
-              className="repo-languages"
-              logos={repo.languages}
-            />
+            <ProjectLanguages className="repo-languages" logos={languages} />
           </div>
           {/* <div className="repo-stats">
           <div className="repo-left-stat">
