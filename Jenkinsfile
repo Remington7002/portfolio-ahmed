@@ -2,12 +2,11 @@
 pipeline {
     agent any
 
-    environment {
-        KATALON_HOME = 'C:\\KatalonWorkspace\\KRE'
-        PROJECT_FILE = 'portfolio-ahmed.prj'
-        TEST_SUITE = 'Test Suites/TESTSUIT'
-    }
-
+  environment {
+    KATALON_HOME = 'C:\\KatalonWorkspace\\KRE'
+    PROJECT_FILE = 'portfolio-ahmed.prj'
+    TEST_SUITE = 'Test Suites/portfoliotest'
+}
     stages {
         stage('Check Tools') {
             steps {
@@ -30,16 +29,17 @@ pipeline {
             }
         }
 
-        stage('Checkout GitHub') {
-            steps {
-                git(
-                    url: 'https://github.com/Remington7002/portfolio-ahmed.git',
-                    branch: 'main',
-                    credentialsId: 'github-credentials'
-                )
-            }
-        }
+       stage('Checkout GitHub') {
+    steps {
+        deleteDir()
+        git branch: 'main',
+            credentialsId: 'github-credentials',
+            url: 'https://github.com/Remington7002/portfolio-ahmed.git'
 
+        bat 'git rev-parse --short HEAD'
+        bat 'git ls-tree -r --name-only HEAD'
+    }
+}
         stage('Validate Project') {
             steps {
                 bat '''
