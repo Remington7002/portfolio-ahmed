@@ -5,7 +5,7 @@ pipeline {
     environment {
         KATALON_HOME = 'C:\\KatalonWorkspace\\KRE'
         PROJECT_FILE = 'portfolio-ahmed.prj'
-        TEST_SUITE = 'Test Cases/Portfolio_test'
+        TEST_SUITE = 'Test Suites/TESTSUIT'
         GITHUB_URL = 'https://github.com/Remington7002/Katalon_Automation_Testing.git'
     }
 
