@@ -6,22 +6,25 @@ pipeline {
         KATALON_HOME = 'C:\\KatalonWorkspace\\KRE'
         PROJECT_FILE = 'portfolio-ahmed.prj'
         TEST_SUITE = 'Test Suites/TESTSUIT'
-        GITHUB_URL = 'https://github.com/Remington7002/Katalon_Automation_Testing.git'
     }
 
     stages {
         stage('Check Tools') {
             steps {
                 bat '''
+                    echo ===== USER =====
                     whoami
+
+                    echo ===== JAVA =====
                     java -version
+
+                    echo ===== GIT =====
                     git --version
 
                     if not exist "%KATALON_HOME%\\katalonc.exe" (
                         echo ERROR: Katalon executable not found.
                         exit /b 1
                     )
-
                     echo Katalon executable found.
                 '''
             }
@@ -29,20 +32,25 @@ pipeline {
 
         stage('Checkout GitHub') {
             steps {
-                git branch: 'main',
-                    url: "${GITHUB_URL}",
+                git(
+                    url: 'https://github.com/Remington7002/portfolio-ahmed.git',
+                    branch: 'main',
                     credentialsId: 'github-credentials'
+                )
             }
         }
 
         stage('Validate Project') {
             steps {
                 bat '''
+                    echo Workspace: %WORKSPACE%
+                    dir /s /b "%WORKSPACE%\\*.prj"
+
                     if not exist "%WORKSPACE%\\%PROJECT_FILE%" (
-                        echo ERROR: Project file not found.
-                        dir /s /b "%WORKSPACE%\\*.prj"
+                        echo ERROR: Katalon project file not found.
                         exit /b 1
                     )
+
                     echo Project file found.
                 '''
             }
@@ -57,16 +65,12 @@ pipeline {
                     )
                 ]) {
                     bat '''
-                        "%KATALON_HOME%\\katalonc.exe" ^
-                        -noSplash ^
-                        -runMode=console ^
-                        -projectPath="%WORKSPACE%\\%PROJECT_FILE%" ^
-                        -testSuitePath="%TEST_SUITE%" ^
-                        -browserType="Edge Chromium" ^
-                        -apiKey="%KATALON_API_KEY%" ^
-                        -retry=0
+                        call "%KATALON_HOME%\\katalonc.exe" -noSplash -runMode=console "-projectPath=%WORKSPACE%\\%PROJECT_FILE%" "-testSuitePath=%TEST_SUITE%" "-browserType=Edge Chromium" "-apiKey=%KATALON_API_KEY%" -retry=0 -statusDelay=15 "-config -webui.autoUpdateDrivers=true"
 
-                        if errorlevel 1 exit /b 1
+                        if errorlevel 1 (
+                            echo ERROR: Katalon execution failed.
+                            exit /b 1
+                        )
                     '''
                 }
             }
@@ -75,10 +79,21 @@ pipeline {
 
     post {
         always {
+            echo 'Katalon execution finished. Collecting reports.'
+
             archiveArtifacts(
                 artifacts: '**/Reports/**/*',
-                allowEmptyArchive: true
+                allowEmptyArchive: true,
+                fingerprint: true
             )
+        }
+
+        success {
+            echo 'KATALON TEST EXECUTION SUCCEEDED'
+        }
+
+        failure {
+            echo 'KATALON EXECUTION FAILED. CHECK CONSOLE OUTPUT.'
         }
     }
 }
